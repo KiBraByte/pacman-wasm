@@ -1,6 +1,11 @@
 import {Game, Difficulty, BlockType, Dir} from "../pkg/pacman.js";
 import {memory} from "../pkg/pacman_bg.wasm";
 
+const HEIGHT = 25;
+const WIDTH = 25;
+const score = document.getElementById("score");
+const lives = document.getElementById("lives");
+
 export class PacManGame {
     static tickRate = 5;
     static renderRate = 20;
@@ -28,7 +33,7 @@ export class PacManGame {
 
 
     getGhosts() {
-        const positions = ["y","x","prev_y","prev_x","color","prev_dir","vulnerable"];
+        const positions = ["id","y","x","prev_y","prev_x","color","prev_dir","vulnerable"];
         let parsed = [];
         let ghosts = this.game.ghosts();
         for (let i = 0; i < ghosts.length; i += positions.length) {
@@ -80,6 +85,10 @@ export class PacManGame {
     }
     getLives() {
         return this.game.lives();
+    }
+    won() {
+
+        return this.game.dot_count() === BigInt(0);
     }
 }
 
@@ -202,8 +211,8 @@ export class GameRenderer {
     }
 
     #drawGhost(ghost, subtick) {
-        if (this.prevGhostPos.length == 4){ 
-            let prevPos = this.prevGhostPos.shift();
+        if (this.prevGhostPos[ghost.id] !== undefined){ 
+            let prevPos = this.prevGhostPos[ghost.id];
             this.ctx.clearRect(this.#getCtxPos(prevPos.x) + 1, this.#getCtxPos(prevPos.y) + 1, this.blockSize - 2, this.blockSize - 2);
         }
 
@@ -214,11 +223,11 @@ export class GameRenderer {
         this.#drawFieldAt(ghost.y, ghost.x);
 
         let soy = ghost.vulnerable ? 5 : ghost.color;
-        let sox = this.renderTick % 2 == 0;
+        let sox = +(this.renderTick % 2 == 0) ;
         sox += ghost.vulnerable ? 0 : ghost.prev_dir == Dir.None ? 6 : ghost.prev_dir * 2;
 
         let [y,x] = this.#getTickAdjustedCord(ghost, subtick);
-        this.prevGhostPos.push({"y": y, "x": x});
+        this.prevGhostPos[ghost.id] = {"y": y, "x": x};
         this.#paintImg(soy,sox,y, x);
 
         //if pacman was behin the ghost he would be hidden by the above clearRect call
@@ -228,7 +237,7 @@ export class GameRenderer {
     }
 
     #drawGhosts(subtick) {
-        if (!this.prevGhostPos) this.prevGhostPos = [];
+        if (this.prevGhostPos === undefined) this.prevGhostPos = {};
         this.game.getGhosts().forEach((ghost) => this.#drawGhost(ghost, subtick));
     }
 
@@ -239,35 +248,47 @@ export class GameRenderer {
     }
 
     clearAll() {
-        this.ctx.clearRect(0,0,getCtxPos(this.width),getCtxPos(this.height));
+        this.ctx.clearRect(0,0,this.#getCtxPos(GameRenderer.canvas.width),this.#getCtxPos(GameRenderer.canvas.height));
     }
 }
 
-const score = document.getElementById("score");
-const lives = document.getElementById("lives");
-
-let game = new PacManGame(31,31,Difficulty.Normal);
-
-GameRenderer.canvas = document.getElementById("game-canvas");
-let renderer = new GameRenderer(game,PacManGame.tickRate,PacManGame.renderRate);
 
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+let totalScore = 0;
+let currentGame;
+let currentRenderer;
+GameRenderer.canvas = document.getElementById("game-canvas");
 async function tick() {
-    let gameover = game.game.tick();
-    score.innerText = "Score: " + game.getScore();
-    lives.innerText = "Lives: " + game.getLives();
+    let gameover = currentGame.game.tick();
+    score.innerText = "Score: " + (currentGame.getScore() + totalScore);
+    lives.innerText = "Lives: " + currentGame.getLives();
 
     for(let subtick = 1; subtick <= PacManGame.renderRate / PacManGame.tickRate; ++subtick) {
         await timeout(1000 / PacManGame.renderRate);
-        renderer.renderEntities(subtick);
+        currentRenderer.renderEntities(subtick);
     }
 
-    if (gameover) return;
+    if (gameover) {
+        alert("GAMEOVER!!!!!");
+        return;
+    }
+    if (currentGame.won()) {
+        totalScore += currentGame.getScore();
+        startNewGame();
+        return;
+    }
     requestAnimationFrame(tick);
 }
 
-renderer.drawField();
-requestAnimationFrame(tick);
+const startNewGame = () => {
+    currentGame = new PacManGame(WIDTH,HEIGHT,Difficulty.Normal);
+    currentRenderer = new GameRenderer(currentGame,PacManGame.tickRate,PacManGame.renderRate);
+    currentRenderer.clearAll();
+    currentRenderer.drawField();
+    requestAnimationFrame(tick);
+}
+
+startNewGame();

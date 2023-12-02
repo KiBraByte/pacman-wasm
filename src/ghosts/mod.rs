@@ -117,7 +117,7 @@ impl Ghost {
         }
         false
     }
-    pub fn parse_for_fe(&self) -> [u32; 7]{
-        [self.data.cord.0, self.data.cord.1,self.data.prev_cord.0, self.data.prev_cord.1,self.color as u32,self.data.prev_dir as u32, self.vulnerable() as u32]
+    pub fn parse_for_fe(&self) -> [u32; 8]{
+        [self.id,self.data.cord.0, self.data.cord.1,self.data.prev_cord.0, self.data.prev_cord.1,self.color as u32,self.data.prev_dir as u32, self.vulnerable() as u32]
     }
 }

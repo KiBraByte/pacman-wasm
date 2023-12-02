@@ -106,7 +106,7 @@ impl Game{
     }
 
     pub fn ghosts(&self) -> js_sys::Uint32Array {
-        let v: Vec<[u32; 7]> = self.ghosts.iter()
+        let v: Vec<[u32; 8]> = self.ghosts.iter()
             .map(|g| g.parse_for_fe())
             .collect();
         let f: Vec<u32> = v.iter()
