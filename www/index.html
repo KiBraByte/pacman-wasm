@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pacman</title>
+    <style>
+        body {
+            background-color: black;
+        }
+        canvas {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 50%;
+            }
+        #score, #lives {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div><p id="score"></p><p id="lives"></p></div>
+    <canvas id="game-canvas"></canvas>
+    <script src="./dist/bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[package]
+name = "pacman"
+version = "0.1.0"
+authors = ["Kilian Brandstoetter <kilian.brandstoetter@htl-wels.at>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+wasm-bindgen = { version = "0.2.88", features = [] }
+js-sys = { version = "0.3.65", features = [] }
+getrandom = {version = "0.2.10", features = ["js"]}
+rand = { version = "0.8.5", features = [] }
+
+[dependencies.web-sys]
+version = "0.3"
+features = [
+  "console",
+]
+
+[profile.release]
+# Tell `rustc` to optimize for small code size.
+opt-level = "s"
