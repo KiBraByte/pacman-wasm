@@ -25,7 +25,7 @@ Go into the www directory and run
 A directory (./dist), which contains the file bundle.js, should be created.
 
 # Run
-## Run a test server on https://localhost:8000
+## Run a test server on http://localhost:8000
 Go into the www directory and run
 
     python server.py
