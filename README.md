@@ -20,7 +20,7 @@ Go into the www directory and run
 ### create js bundle, that is used by index.html
 Go into the www directory and run
 
-    npx webpack -config webpack.conf.js
+    npx webpack --config webpack.conf.js
 
 A directory (./dist), which contains the file bundle.js, should be created.
 
