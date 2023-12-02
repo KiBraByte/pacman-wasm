@@ -9,4 +9,5 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
 Handler = MyHttpRequestHandler
 
 with socketserver.TCPServer(("", 8000), Handler) as httpd:
+    print("Started Server: localhost:8000")
     httpd.serve_forever()
